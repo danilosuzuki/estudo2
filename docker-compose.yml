@@ -1,0 +1,92 @@
+version: '3.9'
+
+services:
+  quadros-db:
+    image: postgres:12
+    environment:
+      POSTGRES_DB: quadros_db
+      POSTGRES_USER: quadros_user
+      POSTGRES_PASSWORD: quadros_password
+    volumes:
+      - quadros-db:/var/lib/postgresql/data
+
+  quadros-service:
+    build:
+      context: ./quadros
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    depends_on:
+      - quadros-db
+      - notas-service
+      - user-service
+    environment:
+      DB_HOST: quadros-db
+      DB_PORT: 5432
+      DB_DATABASE: quadros_db
+      DB_USERNAME: quadros_user
+      DB_PASSWORD: quadros_password
+    
+  notas-db:
+    image: postgres:12
+    environment:
+      POSTGRES_DB: notas_db
+      POSTGRES_USER: notas_user
+      POSTGRES_PASSWORD: notas_password
+    volumes:
+      - notas-db:/var/lib/postgresql/data
+
+  notas-service:
+    build:
+      context: ./notas
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    depends_on:
+      - notas-db
+    environment:
+      DB_HOST: notas-db
+      DB_PORT: 5432
+      DB_DATABASE: notas_db
+      DB_USERNAME: notas_user
+      DB_PASSWORD: notas_password
+
+  user-db:
+    image: postgres:12
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: user_user
+      POSTGRES_PASSWORD: user_password
+    volumes:
+      - user-db:/var/lib/postgresql/data
+
+  user-service:
+    build:
+      context: ./user
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - user-db
+    environment:
+      DB_HOST: user-db
+      DB_PORT: 5432
+      DB_DATABASE: user_db
+      DB_USERNAME: user_user
+      DB_PASSWORD: user_password
+      NOTAS_SERVICE_URL: http://notas-service:8001/notas
+      
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: danilo.suzuki@hotmail.com
+      PGADMIN_DEFAULT_PASSWORD: pgadmin_password
+    ports:
+      - "5050:80"
+    restart: unless-stopped
+
+volumes:
+  notas-db:
+  user-db:
+  quadros-db:
