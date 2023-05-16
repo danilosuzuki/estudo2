@@ -4,12 +4,19 @@ namespace App\Repositories;
 
 use App\Interfaces\NotasInterface;
 use App\Models\Notas;
+use Illuminate\Database\Eloquent\Model;
 
 class NotasRepository implements NotasInterface
 {
     protected $model;
 
-    public function __construct(Notas $model)
+    //OBRIGATÓRIO
+    public static function getModelClass()
+    {
+        return Notas::class;
+    }
+
+    public function __construct(Model $model)
     {
         $this->model = $model;
     }
@@ -24,12 +31,12 @@ class NotasRepository implements NotasInterface
         return $this->model->create($data);
     }
 
-    public function update(Notas $nota, array $data)
+    public function update(Model $nota, array $data)
     {
         return $nota->update($data);
     }
 
-    public function delete(Notas $nota)
+    public function delete(Model $nota)
     {
         return $nota->delete();
     }

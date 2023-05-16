@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Interfaces\NotasInterface;
+use App\Models\Notas;
+use App\Repositories\NotasRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +16,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $repositories = [
+            NotasInterface::class => NotasRepository::class,
+        ];
+
+        foreach ($repositories as $interface => $implementation) {
+            $this->app->bind($interface, $implementation);
+            $this->app->bind($interface, function ($app) use ($implementation) {
+                $modelClass = $implementation::getModelClass();
+                $model = new $modelClass();
+                return new $implementation($model);
+            });
+        }
     }
 
     /**

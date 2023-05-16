@@ -2,17 +2,19 @@
 
 namespace App\Interfaces;
 
-use App\Models\Notas;
+use Illuminate\Database\Eloquent\Model;
 
 interface NotasInterface
 {
+    public function __construct(Model $model);
+
     public function index();
 
     public function create(array $data);
 
-    public function update(Notas $nota, array $data);
+    public function update(Model $nota, array $data);
 
-    public function delete(Notas $nota);
+    public function delete(Model $nota);
 
     public function find(int $id);
 
